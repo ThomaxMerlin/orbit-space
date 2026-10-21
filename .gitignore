@@ -1,0 +1,10 @@
+# Local development and sensitive settings
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store
+*.log
+
+# Host-specific settings (exclude when exporting to GitHub)
+.openai/

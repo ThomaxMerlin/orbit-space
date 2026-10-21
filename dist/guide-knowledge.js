@@ -1,0 +1,24 @@
+import { discoveries, discoverySources } from './discoveries.js';
+export const names=['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune','Black holes','Sun','Moon','Milky Way'];
+const prompts=[['How long is a day on Mercury?','Is Mercury the hottest planet?','Is there ice on Mercury?'],['Why is a spin on Venus longer than its year?','Where does the Sun rise on Venus?','What is the pressure like on Venus?'],['How much of Earth is covered by water?','Do Earth’s continents move?','What causes auroras on Earth?'],['What is Olympus Mons?','Why is Mars red?','How long is a day on Mars?'],['How fast does Jupiter spin?','What is the Great Red Spot?','Which moon is bigger than Mercury?'],['Could Saturn float in water?','What is Saturn’s hexagon?','What are Saturn’s rings made of?'],['Why does Uranus look sideways?','Why is Uranus blue-green?','Does Uranus have rings?'],['How was Neptune discovered?','How strong are Neptune’s winds?','What is unusual about Triton?'],['Why do black holes look bright around the edges?','Can black holes bend light?','What is Sagittarius A*?'],['How long does sunlight take to reach Earth?','Does the Sun have a solid surface?','What is the Sun’s corona?'],['Is there a dark side of the Moon?','What are the dark patches on the Moon?','Is the Moon moving away from Earth?'],['What is the Milky Way band in the sky?','Where is the Sun in the Milky Way?','What is our galaxy made of?']];
+export const questions=names.flatMap((name,topic)=>discoveries[topic].map((fact,n)=>({question:prompts[topic][n],title:fact[0],answer:fact[1],topic,source:discoverySources[topic]})));
+const stop=new Set('a an the is are was were be been why what which how when where does do did can could would should it its of on in at by for from to and or with about tell me please i want know some facts interesting fun there have has much'.split(' '));
+function words(text){return text.toLowerCase().replace(/[’']/g,'').match(/[a-z0-9]+/g)?.filter(w=>!stop.has(w)).map(w=>w.length>4&&w.endsWith('s')?w.slice(0,-1):w)||[];}
+export function answerQuestion(input){const clean=input.trim();if(!clean)return {answer:'Choose a suggested question, or ask about a planet, the Sun, Moon, black holes or our galaxy.'};if(/^(hi|hello|hey|thanks|thank you)[!. ]*$/i.test(clean))return {answer:'Hello, explorer! Ask a space question, try a random question, or let me quiz you.'};const exact=questions.find(q=>q.question.toLowerCase()===clean.toLowerCase());if(exact)return exact;
+const mentioned=names.map((name,i)=>({i,found:new RegExp('\\b'+(i===8?'black holes?':i===11?'milky way|galaxy':name.toLowerCase())+'\\b','i').test(clean)})).filter(x=>x.found).map(x=>x.i);
+if(mentioned.length===1&&(/\b(tell me|fun fact|interesting|about|discover)\b/i.test(clean)||words(clean).every(t=>words(names[mentioned[0]]).includes(t))))return questions.find(q=>q.topic===mentioned[0]);
+const tokens=words(clean);const scored=questions.map(q=>{const keys=new Set(words(q.question+' '+q.title+' '+q.answer));const hits=tokens.filter(t=>keys.has(t)).length;return {q,hits,score:hits/Math.max(tokens.length,1)+(mentioned.includes(q.topic)?.18:0)}}).sort((a,b)=>b.score-a.score);const best=scored[0];if(best.hits>=2&&best.score>=.62)return {...best.q,related:true};return {answer:'I don’t have a reliable answer to that in this atlas yet. I’m a fact-based space guide, so I can help with the planets, Sun, Moon, black holes and Milky Way. Try one of the questions below or browse NASA for more.',source:'https://science.nasa.gov/'};}
+export const quizzes=[
+{q:'Which planet is the hottest?',choices:['Mercury','Venus','Mars'],correct:1,fact:1},
+{q:'Which planet has a famous hexagonal jet stream?',choices:['Saturn','Earth','Neptune'],correct:0,fact:16},
+{q:'Which planet rotates in about 10 hours?',choices:['Venus','Mars','Jupiter'],correct:2,fact:12},
+{q:'What gives Mars its red color?',choices:['Liquid lava','Rusting iron minerals','Red clouds'],correct:1,fact:10},
+{q:'Which planet is tilted almost on its side?',choices:['Uranus','Mercury','Earth'],correct:0,fact:18},
+{q:'What are the Moon’s dark maria?',choices:['Water-filled oceans','Ancient lava plains','Cloud shadows'],correct:1,fact:31},
+{q:'How long does sunlight take to reach Earth?',choices:['About 8 seconds','About 8 minutes','About 8 hours'],correct:1,fact:27},
+{q:'Where is the Sun within the Milky Way?',choices:['At its center','In the Orion Spur','Outside the galaxy'],correct:1,fact:34},
+{q:'What is Saturn’s average density compared with water?',choices:['Lower','Exactly the same','Higher'],correct:0,fact:15},
+{q:'Which planet was found using mathematical predictions?',choices:['Mars','Venus','Neptune'],correct:2,fact:21},
+{q:'What is Sagittarius A*?',choices:['A comet','Our galaxy’s central black hole','A moon'],correct:1,fact:26},
+{q:'About how much of Earth’s surface is covered by water?',choices:['21%','51%','71%'],correct:2,fact:6}
+];
