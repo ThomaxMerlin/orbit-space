@@ -22,3 +22,11 @@ Same-origin checks are not authentication or abuse protection. For a public laun
 Run `node --test tests/space-ai.test.mjs` from the repository root. Tests use mocked inference; validate answer quality and multilingual behavior against the live model after activation. Try unsupported questions and ensure answers admit uncertainty, and check that follow-ups add detail rather than repeating.
 
 Documentation: https://developers.cloudflare.com/pages/functions/bindings/#workers-ai
+
+## Universe search
+
+The chat now has a “Search the universe” checkbox, enabled by default. This uses Wikipedia's public MediaWiki API for encyclopedia background material; it is not a general web crawler or a live news/launch service. Queries are sent to the selected language's Wikipedia. If an article is missing and the subject is known, an English topic lookup is attempted. English fallback excerpts are labeled by their article language and are not silently translated.
+
+Search works without an AI binding and returns clearly labeled article excerpts. With AI enabled, excerpts become untrusted reference context for the answer, with numbered source links. Source cards include attribution and the CC BY-SA license. Source matching does not guarantee that an article answers the exact question; no matches and upstream failures are explicitly reported. The checkbox can be disabled to use AI/reference mode alone.
+
+The backend only fetches fixed en/my/zh Wikipedia API hosts, uses a descriptive User-Agent, imposes six-second search timeouts, limits retrieval to three short introductions, and never fetches user-supplied URLs. Public endpoint usage still needs account-level request-rate controls. Run `node --test tests/*.test.mjs` for both chat and retrieval tests.
