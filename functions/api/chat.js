@@ -28,10 +28,10 @@ export async function onRequest({request,env}){
  // Optional shared rate-limiter binding, when supported by the hosting configuration.
  if(env.CHAT_RATE_LIMITER){const result=await env.CHAT_RATE_LIMITER.limit({key:request.headers.get('CF-Connecting-IP')||'unknown'});if(!result.success)return json({error:'rate_limited'},429);}
  const retrieved=body.search?await searchUniverse(body.question,history,language):{sources:[],status:'off'};
- const reference=()=>json({answer:language==='my'?'ရှာဖွေတွေ့ရှိသော စာမျက်နှာအကျဉ်းများကို အောက်တွင်ဖတ်နိုင်ပါသည်။ ယင်းသည် AI ရှင်းလင်းချက်မဟုတ်ပါ။':language==='zh'?'以下是找到的参考资料摘录，并非AI生成的解答。':'Here are the reference excerpts I found. These are reference material, not an AI-generated answer.',language,mode:'search',sources:retrieved.sources,searchStatus:retrieved.status});
+ const reference=()=>json({answer:language==='my'?'ရှာဖွေတွေ့ရှိသော စာမျက်နှာအကျဉ်းများကို အောက်တွင်ဖတ်နိုင်ပါသည်။ ယင်းသည် AI ရှင်းလင်းချက်မဟုတ်ပါ။':language==='zh'?'以下是找到的参考资料摘录，并非AI生成的解答。':'Here are the reference excerpts I found. These are reference material, not an AI-generated answer.',language,mode:'search',sources:retrieved.sources,searchStatus:retrieved.status,searchErrors:retrieved.failures});
  if(!env.AI)return reference();
  try{const output=await env.AI.run(env.SPACE_AI_MODEL||'@cf/meta/llama-3.3-70b-instruct-fp8-fast',{messages:buildMessages(body.question.trim(),history,language,retrieved.sources),max_tokens:700,temperature:0.4});
  const text=output?.response;if(typeof text!=='string'||!text.trim())return json({error:'empty_answer'},502);
- return json({answer:text.trim().slice(0,6000),language,mode:'ai',sources:retrieved.sources,searchStatus:retrieved.status});
+ return json({answer:text.trim().slice(0,6000),language,mode:'ai',sources:retrieved.sources,searchStatus:retrieved.status,searchErrors:retrieved.failures});
  }catch{if(body.search)return reference();return json({error:'ai_unavailable'},503);}
 }
