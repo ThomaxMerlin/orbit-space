@@ -1,6 +1,6 @@
 (()=>{
 const header=document.getElementById('site-header'),toggle=document.getElementById('nav-toggle'),nav=document.getElementById('site-navigation'),solar=document.getElementById('solar-menu-toggle'),submenu=document.getElementById('solar-submenu');if(!header||!toggle||!nav)return;
-const small=matchMedia('(max-width:1250px)');header.classList.add('nav-ready');
+const small=matchMedia('(max-width:1450px)');header.classList.add('nav-ready');
 function setSolar(open,focus=false){if(!solar)return;solar.setAttribute('aria-expanded',String(open));submenu.hidden=!open;if(focus)solar.focus()}
 function setOpen(open,focus=false){header.classList.toggle('nav-open',open);toggle.setAttribute('aria-expanded',String(open));toggle.lastElementChild.textContent=open?'×':'☰';if(!open)setSolar(false);if(focus)toggle.focus()}
 toggle.addEventListener('click',()=>setOpen(!header.classList.contains('nav-open')));
