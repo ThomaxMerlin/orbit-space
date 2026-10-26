@@ -32,3 +32,11 @@ Search works without an AI binding and returns clearly labeled article excerpts.
 The backend only fetches fixed en/my/zh Wikipedia API hosts, uses a descriptive User-Agent, imposes six-second search timeouts, limits retrieval to three short introductions, and never fetches user-supplied URLs. Public endpoint usage still needs account-level request-rate controls. Run `node --test tests/*.test.mjs` for both chat and retrieval tests.
 
 When Wikipedia is unavailable or has no matches, search also tries NASA's Image and Video Library descriptions. These are background descriptions, not a general NASA article index. NASA excerpts remain in English and link to the original asset's details and credits. Retrieved NASA descriptions are not labeled as Wikipedia content or licensed as CC BY-SA by ORBIT.
+
+## Related questions and reference expansion
+
+Five editorial topics add NASA-backed summaries and 15 related question prompts in each of English, Burmese and Simplified Chinese: neutron stars, dark matter, cosmic expansion, microgravity and supernovae. This is a reference/catalog update, not fine-tuning or automatic learning from visitors.
+
+Search now queries Wikipedia and NASA concurrently, combines up to three distinct source URLs, and makes at most one additional canonical English lookup. Topic-aware follow-ups resolve pronouns; asking another fact rotates through related search questions. A newly named topic replaces earlier context. Related prompts already asked are omitted. When live retrieval fails, any existing editorial summary is explicitly labeled rather than presented as a fresh result. The sources remain background material, not guaranteed answers or current news.
+
+Tests cover all 45 localized prompts plus pronoun resolution, topic changes, provider failure, source attribution, fiction filtering, and changing another-fact searches. Live answer generation still requires the account's Workers AI binding.
